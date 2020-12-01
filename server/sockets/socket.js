@@ -20,16 +20,19 @@ io.on('connection', (client) => {
         //client.broadcast.emit('listaPersona', usuarios.getPersonas());// emite el ingreso de cualquier usuario a todos los usuarios sin importar la sala
         client.broadcast.to(data.sala).emit('listaPersona', usuarios.getPersonasPorSala(data.sala)); //solo emiete los ususarios al los d ela msima sala
         // callback(personas);
+        //aviso de netrada de un usuario al chat
+        client.broadcast.to(data.sala).emit('crearMensaje', crearMensaje('Administrador', `${data.nombre} se unio`));
         callback(usuarios.getPersonasPorSala(data.sala));
     });
 
 
     //enviamos un mensaje contruido a todos los usuarios
-    client.on('crearMensaje', (data) => { //socket.emit('crearMensaje',{mensaje:'Hola ssssmundo'})
+    client.on('crearMensaje', (data, callback) => { //socket.emit('crearMensaje',{mensaje:'Hola ssssmundo'})
         let persona = usuarios.getPersona(client.id) //cada cliente tien su propio id
         let mensaje = crearMensaje(persona.nombre, data.mensaje); // de la persona obtenemos el nombre automaticamnete, ademas d ela data obtenemos el mensaje
         // client.broadcast.emit('crearMensaje', mensaje)//aka tambien se debe cambiar a las personas que dse emite el mensae basicamente colocar la sala
         client.broadcast.to(persona.sala).emit('crearMensaje', mensaje) // pero la sala la obtengo desde la persona
+        callback(mensaje)
     })
 
     // alerta de retiro de usuario
